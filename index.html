@@ -3,78 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fansu Search Assistant</title>
+    <title>Fansu Job Assistant</title>
+    <!-- Mandatory for 2026 Browser Microphone Access -->
     <meta http-equiv="Permissions-Policy" content="microphone=(self)">
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 40px; background: #f4f4f4; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        button { background: #111; color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .job-card { text-align: left; border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fdfdfd; display: flex; justify-content: center; padding: 40px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 450px; text-align: center; }
+        button { background: #111; color: white; border: none; padding: 15px 35px; border-radius: 50px; cursor: pointer; font-size: 17px; font-weight: 600; transition: transform 0.2s; }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #888; cursor: not-allowed; }
+        #status { margin-top: 20px; color: #777; font-style: italic; min-height: 24px; }
+        .job-card { text-align: left; border: 1px solid #eee; padding: 18px; border-radius: 12px; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .job-card h3 { margin: 0; font-size: 19px; color: #222; }
+        .job-card p { margin: 8px 0; color: #555; font-size: 15px; line-height: 1.4; }
+        .job-card a { color: #007bff; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🎤 Job Talk with Fansu</h2>
-    <p>Get overseas jobs, remote work and visa sponsorships NOW!</p>
+    <div style="font-size: 40px; margin-bottom: 10px;">🎤</div>
+    <h2>Job Talk with Fansu</h2>
+    <p style="color: #666; margin-bottom: 25px;">Get overseas jobs, remote work and visa sponsorships NOW!</p>
+    
     <button id="start-btn">Start Conversation</button>
+    <div id="status"></div>
     <div id="job-container"></div>
 </div>
 
-<!-- 2026 STABLE SDK SOURCE -->
+<!-- 2026 Verified ElevenLabs SDK Entry Point -->
 <script src="elevenlabs.io"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
+    const status = document.getElementById('status');
     const container = document.getElementById('job-container');
 
-    // 1. SAFETY CHECK: Wait for the ElevenLabs global object to exist
-    function getConversation() {
-        if (window.ElevenLabs && window.ElevenLabs.Conversation) {
-            return window.ElevenLabs.Conversation;
-        }
-        return null;
-    }
-
-    btn.onclick = async () => {
-        const Conversation = getConversation();
-        
-        if (!Conversation) {
-            alert("Fansu is still loading. Please wait 2 seconds and try again.");
+    /**
+     * January 2026 SDK Initialization
+     * This loop prevents "ReferenceError: ElevenLabs is not defined"
+     */
+    const startFansu = async () => {
+        // 1. Check if the SDK is ready
+        if (!window.ElevenLabs || !window.ElevenLabs.Conversation) {
+            status.innerText = "Initializing Fansu... please wait.";
+            setTimeout(startFansu, 300); // Retry in 300ms
             return;
         }
 
         try {
-            // Request Microphone
+            // 2. Request Mic access (Vercel requires this explicit step)
             await navigator.mediaDevices.getUserMedia({ audio: true });
             
             btn.disabled = true;
-            btn.innerText = "Listening...";
+            btn.innerText = "Fansu is listening...";
+            status.innerText = "";
 
-            await Conversation.startSession({
+            // 3. Start the Session
+            await window.ElevenLabs.Conversation.startSession({
                 agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1",
                 clientTools: {
                     display_jobs: (parameters) => {
                         const jobs = parameters.jobs || [];
+                        if (jobs.length === 0) {
+                            status.innerText = "No specific matches found. Try broadening your criteria.";
+                            return "No jobs to display.";
+                        }
+                        
                         container.innerHTML = jobs.map(j => `
                             <div class="job-card">
                                 <h3>${j.title}</h3>
                                 <p><strong>${j.company}</strong> — ${j.location}</p>
-                                <a href="${j.link}" target="_blank" style="color: blue;">Apply Now →</a>
+                                <p>${j.summary}</p>
+                                <a href="${j.link}" target="_blank">View Listing →</a>
                             </div>
                         `).join('');
-                        return "Success";
+                        return "Jobs rendered successfully.";
                     }
                 }
             });
         } catch (err) {
-            console.error(err);
+            console.error("Fansu Session Error:", err);
             btn.disabled = false;
             btn.innerText = "Start Conversation";
-            alert("Error: Microphone access denied or Agent ID invalid.");
+            status.innerText = "Error: Please allow microphone access.";
         }
     };
+
+    btn.onclick = startFansu;
 </script>
 
 </body>
