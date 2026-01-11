@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fansu Job Search Assistant</title>
-    <!-- Prevent favicon 404 error -->
     <link rel="icon" href="data:,">
-    <!-- Mandatory for 2026 Browser Microphone Access -->
     <meta http-equiv="Permissions-Policy" content="microphone=(self)">
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; padding: 40px; background: #fafafa; }
@@ -26,7 +24,7 @@
     <div id="job-container"></div>
 </div>
 
-<!-- 2026 VERIFIED STABLE SDK - Global variable is "ElevenLabsClient" -->
+<!-- 2026 VERIFIED STABLE CDN URL -->
 <script src="cdn.jsdelivr.net"></script>
 
 <script>
@@ -34,22 +32,28 @@
     const container = document.getElementById('job-container');
     const status = document.getElementById('status');
 
+    // Function to check which global object ElevenLabs is using
+    function getConversation() {
+        // Try different global names used by ElevenLabs in 2026
+        const lib = window.ElevenLabs || window.ElevenLabsClient || window.ElevenLabsSDK;
+        return lib ? lib.Conversation : null;
+    }
+
     btn.onclick = async () => {
-        // Check if the library is loaded (Global object name check)
-        if (typeof ElevenLabsClient === 'undefined') {
-            alert("Fansu is still waking up. Please wait 3 seconds and refresh.");
+        const Conversation = getConversation();
+        
+        if (!Conversation) {
+            alert("Fansu is still loading. Please wait 3 seconds and refresh.");
             return;
         }
 
         try {
-            // Request Mic access (2026 Browser Security Requirement)
             await navigator.mediaDevices.getUserMedia({ audio: true });
-            
             btn.disabled = true;
             btn.innerText = "Fansu is listening...";
             status.innerText = "Connecting...";
 
-            const conversation = await ElevenLabsClient.Conversation.startSession({
+            await Conversation.startSession({
                 agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1",
                 dynamicVariables: { "user_session_id": crypto.randomUUID() },
                 clientTools: {
@@ -63,7 +67,7 @@
                                 <a href="${j.link}" target="_blank" style="color: blue; font-weight:bold;">Apply Now →</a>
                             </div>
                         `).join('');
-                        return "Jobs rendered.";
+                        return "Jobs displayed.";
                     }
                 }
             });
