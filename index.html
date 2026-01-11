@@ -3,76 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fansu Job Assistant | The Exam Vault</title>
-    <!-- Mandatory for 2026 Browser Mic Access -->
+    <title>Fansu Search Assistant</title>
     <meta http-equiv="Permissions-Policy" content="microphone=(self)">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f9f9f9; display: flex; justify-content: center; padding: 40px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 500px; text-align: center; }
-        #start-btn { background: #111; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; cursor: pointer; transition: 0.3s; }
-        #start-btn:disabled { background: #666; cursor: not-allowed; }
-        #status { margin-top: 20px; color: #666; font-style: italic; display: none; }
-        .job-card { text-align: left; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-top: 15px; transition: 0.2s; }
-        .job-card:hover { border-color: #007bff; }
-        .job-card h3 { margin: 0; font-size: 18px; }
-        .job-card p { margin: 5px 0; color: #444; font-size: 14px; }
-        .job-card a { color: #007bff; text-decoration: none; font-weight: bold; font-size: 14px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 40px; background: #f4f4f4; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        button { background: #111; color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .job-card { text-align: left; border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🎤 Talk to Fansu</h2>
-    <p>Get your forklift job recommendations in Germany.</p>
-    <button id="start-btn">Start Career Chat</button>
-    
-    <div id="status">🔍 Fansu is searching for roles...</div>
+    <h2>🎤 Job Talk with Fansu</h2>
+    <p>Get overseas jobs, remote work and visa sponsorships NOW!</p>
+    <button id="start-btn">Start Conversation</button>
     <div id="job-container"></div>
 </div>
 
-<!-- Load ElevenLabs SDK directly -->
+<!-- 2026 STABLE SDK SOURCE -->
 <script src="elevenlabs.io"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
-    const status = document.getElementById('status');
     const container = document.getElementById('job-container');
 
+    // 1. SAFETY CHECK: Wait for the ElevenLabs global object to exist
+    function getConversation() {
+        if (window.ElevenLabs && window.ElevenLabs.Conversation) {
+            return window.ElevenLabs.Conversation;
+        }
+        return null;
+    }
+
     btn.onclick = async () => {
+        const Conversation = getConversation();
+        
+        if (!Conversation) {
+            alert("Fansu is still loading. Please wait 2 seconds and try again.");
+            return;
+        }
+
         try {
-            // 1. Explicitly request Mic access
+            // Request Microphone
             await navigator.mediaDevices.getUserMedia({ audio: true });
             
             btn.disabled = true;
-            btn.innerText = "Fansu is listening...";
+            btn.innerText = "Listening...";
 
-            // 2. Start Session
-            // Note: In 2026, the global is ElevenLabs (not ElevenLabsClient)
-            const conversation = await ElevenLabs.Conversation.startSession({
+            await Conversation.startSession({
                 agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1",
-                dynamicVariables: { "user_session_id": crypto.randomUUID() },
                 clientTools: {
-                    // This is the bridge that catches the jobs
                     display_jobs: (parameters) => {
-                        status.style.display = 'none';
                         const jobs = parameters.jobs || [];
                         container.innerHTML = jobs.map(j => `
                             <div class="job-card">
                                 <h3>${j.title}</h3>
                                 <p><strong>${j.company}</strong> — ${j.location}</p>
-                                <p>${j.summary}</p>
-                                <a href="${j.link}" target="_blank">Apply Now →</a>
+                                <a href="${j.link}" target="_blank" style="color: blue;">Apply Now →</a>
                             </div>
                         `).join('');
-                        return "Jobs rendered successfully.";
+                        return "Success";
                     }
                 }
             });
         } catch (err) {
             console.error(err);
-            alert("Connection failed. Ensure your Vercel URL is in the ElevenLabs Allowlist.");
             btn.disabled = false;
-            btn.innerText = "Start Career Chat";
+            btn.innerText = "Start Conversation";
+            alert("Error: Microphone access denied or Agent ID invalid.");
         }
     };
 </script>
