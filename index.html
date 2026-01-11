@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fansu Assistant | The Exam Vault</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://elevenlabs.io;">
+    <title>Fansu Job Search Assistant</title>
     <link rel="icon" href="data:,">
     <!-- Mandatory for 2026 Microphone Access -->
     <meta http-equiv="Permissions-Policy" content="microphone=(self)">
@@ -22,8 +23,8 @@
 
 <div class="card">
     <div style="font-size: 40px; margin-bottom: 10px;">🎤</div>
-    <h2>Fansu Job Assistant</h2>
-    <p style="color: #666; margin-bottom: 25px;">Forklift driver career search for Germany.</p>
+    <h2>Job Talk with Fansu</h2>
+    <p style="color: #666; margin-bottom: 25px;">Get overseas jobs, remote work and visa sponsorships NOW!</p>
     
     <button id="start-btn" disabled>Loading Fansu...</button>
     <div id="status"></div>
@@ -31,7 +32,7 @@
 </div>
 
 <!-- MANDATORY 2026 STABLE PATH -->
-<script src="https://elevenlabs.io/convai-widget/index.js"></script>
+<script src="https://elevenlabs.io/convai-widget/v1/index.js"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
@@ -127,4 +128,3 @@
 
 </body>
 </html>
-
