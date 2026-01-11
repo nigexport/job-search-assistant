@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fansu Job Search Assistant</title>
+    <!-- Prevent favicon 404 error -->
+    <link rel="icon" href="data:,">
+    <!-- Mandatory for 2026 Browser Microphone Access -->
     <meta http-equiv="Permissions-Policy" content="microphone=(self)">
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; padding: 40px; background: #fafafa; }
@@ -23,31 +26,32 @@
     <div id="job-container"></div>
 </div>
 
-<!-- 2026 STABLE GLOBAL LOADER - No 404s from this URL -->
-<script src="unpkg.com"></script>
+<!-- 2026 VERIFIED STABLE SDK - Global variable is "ElevenLabsClient" -->
+<script src="cdn.jsdelivr.net"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
     const container = document.getElementById('job-container');
     const status = document.getElementById('status');
 
-    // We use ElevenLabsClient (the global object provided by the UMD script)
     btn.onclick = async () => {
+        // Check if the library is loaded (Global object name check)
         if (typeof ElevenLabsClient === 'undefined') {
-            alert("SDK is still loading from the CDN. Please wait 3 seconds.");
+            alert("Fansu is still waking up. Please wait 3 seconds and refresh.");
             return;
         }
 
         try {
-            // Request Mic
+            // Request Mic access (2026 Browser Security Requirement)
             await navigator.mediaDevices.getUserMedia({ audio: true });
             
             btn.disabled = true;
-            btn.innerText = "Listening...";
-            status.innerText = "Connecting to Fansu...";
+            btn.innerText = "Fansu is listening...";
+            status.innerText = "Connecting...";
 
             const conversation = await ElevenLabsClient.Conversation.startSession({
-                agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1", // Ensure this matches your dashboard
+                agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1",
+                dynamicVariables: { "user_session_id": crypto.randomUUID() },
                 clientTools: {
                     display_jobs: (parameters) => {
                         status.innerText = "";
