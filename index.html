@@ -24,26 +24,24 @@
     <div id="job-container"></div>
 </div>
 
-<!-- 2026 VERIFIED STABLE CDN URL -->
-<script src="cdn.jsdelivr.net"></script>
+<!-- Using Fastly mirror to bypass cdn.jsdelivr.net blocks -->
+<script src="fastly.jsdelivr.net"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
     const container = document.getElementById('job-container');
     const status = document.getElementById('status');
 
-    // Function to check which global object ElevenLabs is using
-    function getConversation() {
-        // Try different global names used by ElevenLabs in 2026
-        const lib = window.ElevenLabs || window.ElevenLabsClient || window.ElevenLabsSDK;
-        return lib ? lib.Conversation : null;
-    }
+    // In the 2026 UMD build, the SDK is attached to window.ElevenLabs
+    const getSDK = () => {
+        return window.ElevenLabs ? window.ElevenLabs.Conversation : null;
+    };
 
     btn.onclick = async () => {
-        const Conversation = getConversation();
+        const ConversationSDK = getSDK();
         
-        if (!Conversation) {
-            alert("Fansu is still loading. Please wait 3 seconds and refresh.");
+        if (!ConversationSDK) {
+            alert("Fansu SDK is still loading from the mirror. Please wait a few seconds and try again.");
             return;
         }
 
@@ -53,7 +51,7 @@
             btn.innerText = "Fansu is listening...";
             status.innerText = "Connecting...";
 
-            await Conversation.startSession({
+            await ConversationSDK.startSession({
                 agentId: "agent_8901ke5m8kyfe0k9g7mfzvnh8te1",
                 dynamicVariables: { "user_session_id": crypto.randomUUID() },
                 clientTools: {
@@ -67,7 +65,7 @@
                                 <a href="${j.link}" target="_blank" style="color: blue; font-weight:bold;">Apply Now →</a>
                             </div>
                         `).join('');
-                        return "Jobs displayed.";
+                        return "Jobs rendered successfully.";
                     }
                 }
             });
@@ -79,6 +77,5 @@
         }
     };
 </script>
-
 </body>
 </html>
