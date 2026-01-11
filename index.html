@@ -17,22 +17,22 @@
 <body>
 
 <div class="card">
-    <h2>🎤 Job Talk with Fansu</h2>
-    <p style="color: #666;">Get overseas jobs, remote work and visa sponsorships NOW!</p>
+    <h2>🎤 Talk to Fansu</h2>
+    <p style="color: #666;">Global Career Assistant</p>
     <button id="start-btn">Start Conversation</button>
     <div id="status" style="margin-top: 15px; color: #888; font-style: italic;"></div>
     <div id="job-container"></div>
 </div>
 
-<!-- Using Fastly mirror to bypass cdn.jsdelivr.net blocks -->
-<script src="fastly.jsdelivr.net"></script>
+<!-- Verified Gcore Mirror for ElevenLabs SDK -->
+<script src="gcore.jsdelivr.net"></script>
 
 <script>
     const btn = document.getElementById('start-btn');
     const container = document.getElementById('job-container');
     const status = document.getElementById('status');
 
-    // In the 2026 UMD build, the SDK is attached to window.ElevenLabs
+    // The UMD build exports to window.ElevenLabs
     const getSDK = () => {
         return window.ElevenLabs ? window.ElevenLabs.Conversation : null;
     };
@@ -41,7 +41,7 @@
         const ConversationSDK = getSDK();
         
         if (!ConversationSDK) {
-            alert("Fansu SDK is still loading from the mirror. Please wait a few seconds and try again.");
+            alert("Fansu SDK is still loading from the mirror. Please wait a few seconds.");
             return;
         }
 
@@ -65,7 +65,7 @@
                                 <a href="${j.link}" target="_blank" style="color: blue; font-weight:bold;">Apply Now →</a>
                             </div>
                         `).join('');
-                        return "Jobs rendered successfully.";
+                        return "Success";
                     }
                 }
             });
@@ -73,7 +73,7 @@
             console.error("Fansu Error:", err);
             btn.disabled = false;
             btn.innerText = "Start Conversation";
-            status.innerText = "Error: Check Microphone or Domain Allowlist.";
+            status.innerText = "Check Microphone or Domain Allowlist.";
         }
     };
 </script>
